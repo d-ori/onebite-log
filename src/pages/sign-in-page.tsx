@@ -5,17 +5,32 @@ import { Input } from "@/components/ui/input";
 import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password";
 import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth";
 import githubLogo from "@/assets/github-mark.svg";
+import { toast } from "sonner";
+import { generateErrorMessage } from "@/lib/error";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signInWithPassword } = useSignInWithPassword({
-    onError: () => {
-      setPassword("");
-    },
-  });
-  const { mutate: signInwithOAuth } = useSignInWithOAuth();
+  const { mutate: signInWithPassword, isPending: isSignwithPasswordPending } =
+    useSignInWithPassword({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
+        toast.error(message, {
+          position: "top-center",
+        });
+        setPassword("");
+      },
+    });
+  const { mutate: signInwithOAuth, isPending: isSignInWithOAuthPeding } =
+    useSignInWithOAuth({
+      onError: (error) => {
+        const message = generateErrorMessage(error);
+        toast.error(message, {
+          position: "top-center",
+        });
+      },
+    });
 
   const handleSignInClick = () => {
     if (email.trim() === "") return;
@@ -28,11 +43,14 @@ export default function SignInPage() {
     signInwithOAuth("github");
   };
 
+  const isPending = isSignwithPasswordPending || isSignInWithOAuthPeding;
+
   return (
     <div className="flex flex-col gap-8">
       <div className="text-xl font-bold">로그인</div>
       <div className="flex flex-col gap-2">
         <Input
+          disabled={isPending}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="py-6"
@@ -40,6 +58,7 @@ export default function SignInPage() {
           placeholder="example@abc.com"
         />
         <Input
+          disabled={isPending}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="py-6"
