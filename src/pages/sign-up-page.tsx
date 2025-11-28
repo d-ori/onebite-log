@@ -46,7 +46,11 @@ export default function SignUpPage() {
         />
       </div>
       <div>
-        <Button className="w-full" onClick={handleSignUpClick}>
+        <Button
+          className="w-full"
+          onClick={handleSignUpClick}
+          disabled={isPending}
+        >
           회원가입
         </Button>
       </div>

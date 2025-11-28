@@ -67,10 +67,15 @@ export default function SignInPage() {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" onClick={handleSignInClick}>
+        <Button
+          className="w-full"
+          onClick={handleSignInClick}
+          disabled={isPending}
+        >
           로그인
         </Button>
         <Button
+          disabled={isPending}
           className="w-full"
           variant={"outline"}
           onClick={handleSignInWithGithubClick}
