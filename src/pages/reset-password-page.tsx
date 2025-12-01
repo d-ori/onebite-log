@@ -42,6 +42,7 @@ export default function ResetPasswordPage() {
       </div>
       <Input
         disabled={isUpdatePasswordPending}
+        value={password}
         onChange={(e) => setPassword(e.target.value)}
         type="password"
         className="py-6"

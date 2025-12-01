@@ -15,13 +15,15 @@ const initialState = {
 const useSessionStore = create(
   devtools(
     combine(initialState, (set) => ({
-      action: {
+      actions: {
         setSession: (session: Session | null) => {
           set({ session, isLoaded: true });
         },
       },
     })),
-    { name: "sessionStore" },
+    {
+      name: "sessionStore",
+    },
   ),
 );
 
@@ -36,6 +38,6 @@ export const useIsSessionLoaded = () => {
 };
 
 export const useSetSession = () => {
-  const setSession = useSessionStore((store) => store.action.setSession);
+  const setSession = useSessionStore((store) => store.actions.setSession);
   return setSession;
 };

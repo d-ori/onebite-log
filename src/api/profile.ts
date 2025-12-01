@@ -15,9 +15,13 @@ export async function fetchProfile(userId: string) {
 export async function createProfile(userId: string) {
   const { data, error } = await supabase
     .from("profile")
-    .insert({ id: userId, nickname: getRandomNickname() })
+    .insert({
+      id: userId,
+      nickname: getRandomNickname(),
+    })
     .select()
     .single();
-  if (error) return error;
+
+  if (error) throw error;
   return data;
 }

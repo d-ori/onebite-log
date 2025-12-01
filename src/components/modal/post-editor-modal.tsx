@@ -1,8 +1,8 @@
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { usePostEditorModal } from "@/store/post-editor-modal";
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "../ui/button";
 import { ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export default function PostEditorModal() {
   const { isOpen, close } = usePostEditorModal();
