@@ -1,3 +1,9 @@
+import CreatePostButton from "@/components/post/create-post-button";
+
 export default function IndexPage() {
-  return <div>IndexPage</div>;
+  return (
+    <div>
+      <CreatePostButton />
+    </div>
+  );
 }
