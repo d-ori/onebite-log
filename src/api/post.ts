@@ -14,6 +14,7 @@ export async function fetchPosts({
   const { data, error } = await supabase
     .from("post")
     .select("*, author: profile!author_id (*), myLiked: like!post_id (*)")
+    .eq("like.user_id", userId)
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -34,6 +35,7 @@ export async function fetchPostById({
   const { data, error } = await supabase
     .from("post")
     .select("*, author: profile!author_id (*), myLiked: like!post_id (*)")
+    .eq("like.user_id", userId)
     .eq("id", postId)
     .single();
 
