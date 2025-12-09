@@ -1,13 +1,13 @@
 import PostItem from "./post-item";
 import Fallback from "../fallback";
-import Loader from "../Loader";
+import Loader from "../loader";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfinitePostsData } from "@/hooks/queries/use-infinite-posts-data";
 
-export default function PostFeed({ authorId }: { authorId: string }) {
+export default function PostFeed({ authorId }: { authorId?: string }) {
   const { data, error, isPending, isFetchingNextPage, fetchNextPage } =
-    useInfinitePostsData();
+    useInfinitePostsData(authorId);
   const { ref, inView } = useInView();
 
   useEffect(() => {
