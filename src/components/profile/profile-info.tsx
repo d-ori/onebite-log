@@ -2,8 +2,11 @@ import { useProfileData } from "@/hooks/queries/use-profile-data";
 import Fallback from "../fallback";
 import Loader from "../loader";
 import defaultAvatar from "@/assets/default-avatar.jpg";
+import { useSession } from "@/store/session";
+import EditProfileButton from "./edit-profile-button";
 
 export default function ProfileInfo({ userId }: { userId: string }) {
+  const session = useSession();
   const {
     data: profile,
     isPending: isFetchingProfilePending,
@@ -12,6 +15,8 @@ export default function ProfileInfo({ userId }: { userId: string }) {
 
   if (fetchProfileDataError) return <Fallback />;
   if (isFetchingProfilePending) return <Loader />;
+
+  const isMine = session?.user.id === userId;
 
   return (
     <div className="flex flex-col items-center justify-center gap-5">
@@ -23,6 +28,7 @@ export default function ProfileInfo({ userId }: { userId: string }) {
         <div className="text-xl font-bold">{profile.nickname}</div>
         <div className="text-muted-foreground">{profile.bio}</div>
       </div>
+      {isMine && <EditProfileButton />}
     </div>
   );
 }
