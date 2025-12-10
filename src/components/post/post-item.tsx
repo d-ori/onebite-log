@@ -6,21 +6,21 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { formatTimeAgo } from "@/lib/time";
-import EditPostItemButton from "./edit-post-button";
-import DeletePostButton from "./delete-post-button";
+import DeletePostButton from "@/components/post/delete-post-button";
 import { useSession } from "@/store/session";
 import { usePostByIdData } from "@/hooks/queries/use-post-by-id-data";
-import Loader from "../loader";
-import Fallback from "../fallback";
-import LikePostButton from "./like-post-button";
+import Loader from "@/components/loader";
+import Fallback from "@/components/fallback";
+import LikePostButton from "@/components/post/like-post-button";
 import { Link } from "react-router";
+import EditPostItemButton from "@/components/post/edit-post-button";
 
 export default function PostItem({
   postId,
   type,
 }: {
   postId: number;
-  type: string;
+  type: "FEED" | "DETAIL";
 }) {
   const session = useSession();
   const userId = session?.user.id;
@@ -31,7 +31,7 @@ export default function PostItem({
     error,
   } = usePostByIdData({
     postId,
-    type: "FEED",
+    type,
   });
 
   if (isPending) return <Loader />;
@@ -116,10 +116,12 @@ export default function PostItem({
 
         {/* 3-2. 댓글 버튼 */}
         {type === "FEED" && (
-          <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border-1 p-2 px-4 text-sm">
-            <MessageCircle className="h-4 w-4" />
-            <span>댓글 달기</span>
-          </div>
+          <Link to={`/post/${post.id}`}>
+            <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border-1 p-2 px-4 text-sm">
+              <MessageCircle className="h-4 w-4" />
+              <span>댓글 달기</span>
+            </div>
+          </Link>
         )}
       </div>
     </div>
