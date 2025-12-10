@@ -33,7 +33,7 @@ const usePostEditorModalStore = create(
         openCreate: () => {
           set({ isOpen: true, type: "CREATE" });
         },
-        opneEdit: (param: Omit<EditMode, "isOpen" | "type">) => {
+        openEdit: (param: Omit<EditMode, "isOpen" | "type">) => {
           set({ isOpen: true, type: "EDIT", ...param });
         },
         close: () => {
@@ -41,7 +41,9 @@ const usePostEditorModalStore = create(
         },
       },
     })),
-    { name: "postEditorModalStore" },
+    {
+      name: "postEditorModalStore",
+    },
   ),
 );
 
@@ -51,9 +53,10 @@ export const useOpenCreatePostModal = () => {
   );
   return openCreate;
 };
+
 export const useOpenEditPostModal = () => {
-  const opneEdit = usePostEditorModalStore((store) => store.actions.opneEdit);
-  return opneEdit;
+  const openEdit = usePostEditorModalStore((store) => store.actions.openEdit);
+  return openEdit;
 };
 
 export const usePostEditorModal = () => {

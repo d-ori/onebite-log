@@ -1,12 +1,12 @@
+import Fallback from "@/components/fallback";
+import Loader from "@/components/loader";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useProfileData } from "@/hooks/queries/use-profile-data";
-import { useProfileEditorModal } from "@/store/profile-editor-modal";
 import { useSession } from "@/store/session";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import Fallback from "../fallback";
-import Loader from "../loader";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import defaultAvatar from "@/assets/default-avatar.jpg";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useProfileEditorModal } from "@/store/profile-editor-modal";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useUpdateProfile } from "@/hooks/mutations/profile/use-update-profile";
 import { toast } from "sonner";
@@ -29,11 +29,14 @@ export default function ProfileEditorModal() {
 
   const { mutate: updateProfile, isPending: isUpdateProfilePending } =
     useUpdateProfile({
-      onSuccess: () => close(),
-      onError: (error) =>
-        toast.error("프로필 수정에 실패했습니다.", {
+      onSuccess: () => {
+        close();
+      },
+      onError: (error) => {
+        toast.error("프로필 수정에 실패했습니다", {
           position: "top-center",
-        }),
+        });
+      },
     });
 
   const [avatarImage, setAvatarImage] = useState<Image | null>(null);
@@ -50,9 +53,9 @@ export default function ProfileEditorModal() {
 
   useEffect(() => {
     if (isOpen && profile) {
-      setAvatarImage(null);
       setNickname(profile.nickname);
       setBio(profile.bio);
+      setAvatarImage(null);
     }
   }, [profile, isOpen]);
 
@@ -60,9 +63,9 @@ export default function ProfileEditorModal() {
     if (nickname.trim() === "") return;
     updateProfile({
       userId: session!.user.id,
-      avatarImageFile: avatarImage?.file,
       nickname,
       bio,
+      avatarImageFile: avatarImage?.file,
     });
   };
 
@@ -102,7 +105,9 @@ export default function ProfileEditorModal() {
                 onClick={() => {
                   if (fileInputRef.current) fileInputRef.current.click();
                 }}
-                src={profile.avatar_url || defaultAvatar}
+                src={
+                  avatarImage?.previewUrl || profile.avatar_url || defaultAvatar
+                }
                 className="h-20 w-20 cursor-pointer rounded-full object-cover"
               />
             </div>

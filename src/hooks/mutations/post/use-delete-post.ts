@@ -2,7 +2,11 @@ import { deleteImagesInPath } from "@/api/image";
 import { deletePost } from "@/api/post";
 import { QUERY_KEYS } from "@/lib/constants";
 import type { UseMutationCallback } from "@/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 
 export function useDeletePost(callbacks?: UseMutationCallback) {
   const queryClient = useQueryClient();
@@ -16,8 +20,30 @@ export function useDeletePost(callbacks?: UseMutationCallback) {
         await deleteImagesInPath(`${deletedPost.author_id}/${deletedPost.id}`);
       }
 
-      queryClient.resetQueries({
-        queryKey: QUERY_KEYS.post.list,
+      // 1. 포스트 리스트 캐시 <- 현재 삭제된 포스트의 아이디를 제거
+      queryClient.setQueryData<InfiniteData<number[]>>(
+        QUERY_KEYS.post.list,
+        (prev) => {
+          if (!prev)
+            throw new Error(
+              "포스트 리스트를 캐시 데이터에서 찾을 수 없습니다.",
+            );
+
+          return {
+            ...prev,
+            pages: prev.pages.map((page) => {
+              if (page.includes(deletedPost.id)) {
+                return page.filter((id) => id !== deletedPost.id);
+              }
+              return page;
+            }),
+          };
+        },
+      );
+
+      // 2. 정규화된 포스트 데이터도 제거
+      queryClient.removeQueries({
+        queryKey: QUERY_KEYS.post.byId(deletedPost.id),
       });
     },
     onError: (error) => {

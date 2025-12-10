@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
+import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
+import { useOpenAlertModal } from "@/store/alert-modal";
 import { usePostEditorModal } from "@/store/post-editor-modal";
+import { useSession } from "@/store/session";
 import { ImageIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
-import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
-import { useSession } from "@/store/session";
-import { useOpenAlertModal } from "@/store/alert-modal";
-import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
 
 type Image = {
   file: File;
@@ -25,17 +29,18 @@ export default function PostEditorModal() {
     onSuccess: () => {
       postEditorModal.actions.close();
     },
-    onError: (error) =>
+    onError: (error) => {
       toast.error("포스트 생성에 실패했습니다", {
         position: "top-center",
-      }),
+      });
+    },
   });
 
   const { mutate: updatePost, isPending: isUpdatePostPending } = useUpdatePost({
     onSuccess: () => {
       postEditorModal.actions.close();
     },
-    onError: () => {
+    onError: (error) => {
       toast.error("포스트 수정에 실패했습니다", {
         position: "top-center",
       });
@@ -48,7 +53,6 @@ export default function PostEditorModal() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 입력창 높이 자동 조절
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -59,7 +63,9 @@ export default function PostEditorModal() {
 
   useEffect(() => {
     if (!postEditorModal.isOpen) {
-      images.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+      images.forEach((image) => {
+        URL.revokeObjectURL(image.previewUrl);
+      });
       return;
     }
 
@@ -77,7 +83,7 @@ export default function PostEditorModal() {
   const handleCloseModal = () => {
     if (content !== "" || images.length !== 0) {
       openAlertModal({
-        title: "게시글 작성중입니다.",
+        title: "게시글 작성이 마무리 되지 않았습니다",
         description: "이 화면에서 나가면 작성중이던 내용이 사라집니다.",
         onPositive: () => {
           postEditorModal.actions.close();
@@ -127,6 +133,7 @@ export default function PostEditorModal() {
     setImages((prevImages) =>
       prevImages.filter((item) => item.previewUrl !== image.previewUrl),
     );
+
     URL.revokeObjectURL(image.previewUrl);
   };
 
@@ -152,11 +159,28 @@ export default function PostEditorModal() {
           multiple
           className="hidden"
         />
+        {postEditorModal.isOpen && postEditorModal.type === "EDIT" && (
+          <Carousel>
+            <CarouselContent>
+              {postEditorModal.imageUrls?.map((url) => (
+                <CarouselItem className="basis-2/5" key={url}>
+                  <div className="relative">
+                    <img
+                      src={url}
+                      className="h-full w-full rounded-sm object-cover"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        )}
+
         {images.length > 0 && (
           <Carousel>
             <CarouselContent>
               {images.map((image) => (
-                <CarouselItem key={image.previewUrl} className="basis-2/5">
+                <CarouselItem className="basis-2/5" key={image.previewUrl}>
                   <div className="relative">
                     <img
                       src={image.previewUrl}
@@ -174,15 +198,19 @@ export default function PostEditorModal() {
             </CarouselContent>
           </Carousel>
         )}
-        <Button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isPending}
-          variant={"outline"}
-          className="cursor-pointer"
-        >
-          <ImageIcon />
-          이미지 추가
-        </Button>
+        {postEditorModal.isOpen && postEditorModal.type === "CREATE" && (
+          <Button
+            onClick={() => {
+              fileInputRef.current?.click();
+            }}
+            disabled={isPending}
+            variant={"outline"}
+            className="cursor-pointer"
+          >
+            <ImageIcon />
+            이미지 추가
+          </Button>
+        )}
         <Button
           disabled={isPending}
           onClick={handleSavePostClick}
