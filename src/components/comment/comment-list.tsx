@@ -11,14 +11,20 @@ function toNestedComments(comments: Comment[]): NestedComment[] {
     if (!comment.parent_comment_id) {
       result.push({ ...comment, children: [] });
     } else {
-      const parentCommentIndex = result.findIndex(
+      const rootCommentIndex = result.findIndex(
+        (item) => item.id === comment.root_comment_id,
+      );
+      const parentComment = result.find(
         (item) => item.id === comment.parent_comment_id,
       );
 
-      result[parentCommentIndex].children.push({
+      if (rootCommentIndex === -1) return;
+      if (!parentComment) return;
+
+      result[rootCommentIndex].children.push({
         ...comment,
         children: [],
-        parentComment: result[parentCommentIndex],
+        parentComment,
       });
     }
   });
